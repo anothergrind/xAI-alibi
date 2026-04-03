@@ -1,0 +1,2 @@
+conda activate xai-alibi
+venv\Scripts\activate
