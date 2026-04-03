@@ -1,5 +1,7 @@
+import os
 import tensorflow as tf
 tf.compat.v1.disable_eager_execution()
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import numpy as np
 import pandas as pd
@@ -78,7 +80,7 @@ def main() -> None:
     print("Explainer fitted")
 
     low_quality_indices = np.where(y_test == 0)[0]
-    x_instance = x_test_sc[low_quality_indices[0] : low_quality_indices[0] + 1]
+    x_instance = x_test_sc[low_quality_indices[1] : low_quality_indices[1] + 1]
 
     original_prediction = model.predict(x_instance)[0]
     original_probabilities = model.predict_proba(x_instance)[0]
