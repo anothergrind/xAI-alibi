@@ -2,8 +2,7 @@ from alibi.datasets import fetch_adult
 
 from alibi.explainers import AnchorTabular
 
-import pandas as pd
-from sklearn.datasets import load_wine, fetch_openml
+from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestRegressor
 
 

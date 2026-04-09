@@ -1,0 +1,32 @@
+(xai-alibi) PS C:\Users\Kamsi\Downloads\code\ug_research\xAI-alibi> python wine.py
+Model accuracy: 0.842
+
+Original prediction : Low Quality
+Probabilities       : Low=0.740  High=0.260
+
+Counterfactual prediction : High Quality
+Probabilities             : Low=0.430  High=0.570
+
+Features changed to flip Low → High Quality
+  Feature  Original Value  Counterfactual  Change
+sulphates            0.51           0.581   0.071
+  alcohol            9.80          10.353   0.553
+
+
+//
+
+  (xai-alibi) PS C:\Users\Kamsi\Downloads\code\ug_research\xAI-alibi> python wine.py
+Model accuracy: 0.842
+
+Original prediction : Low Quality
+Probabilities       : Low=0.630  High=0.370
+
+Counterfactual prediction : High Quality
+Probabilities             : Low=0.460  High=0.540
+
+Features changed to flip Low -> High Quality
+             Feature  Original Value  Counterfactual  Change
+      residual_sugar          18.150       15.427000  -2.723
+           chlorides           0.047        0.045000  -0.002
+total_sulfur_dioxide         182.000      161.315002 -20.685
+           sulphates           0.520        0.473000  -0.047

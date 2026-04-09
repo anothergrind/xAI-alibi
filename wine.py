@@ -15,7 +15,7 @@ from ucimlrepo import fetch_ucirepo
 RANDOM_STATE = 42
 QUALITY_THRESHOLD = 6
 
-
+# load data
 def load_wine_quality_data() -> tuple[np.ndarray, np.ndarray, list[str]]:
     wine = fetch_ucirepo(id=186)
     features = wine.data.features
@@ -66,7 +66,10 @@ def build_explainer(model: RandomForestClassifier, x_train_scaled: np.ndarray) -
 
 
 def describe_label(label: int) -> str:
-    return "High Quality" if label == 1 else "Low Quality"
+    if label == 1:
+        return "High Quality" 
+    else:
+        return "Low Quality"
 
 
 def main() -> None:
