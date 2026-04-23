@@ -13,6 +13,7 @@ from ucimlrepo import fetch_ucirepo
 
 RANDOM_STATE = 42
 QUALITY_THRESHOLD = 6
+NUM_EXPERIMENTS = 5
 
 # load data
 def load_wine_quality_data() -> tuple[np.ndarray, np.ndarray, list[str]]:
@@ -82,47 +83,54 @@ def main() -> None:
     print("Explainer fitted")
 
     low_quality_indices = np.where(y_test == 0)[0]
-    x_instance = x_test_sc[low_quality_indices[1] : low_quality_indices[1] + 1]
+    n = min(NUM_EXPERIMENTS, len(low_quality_indices))
 
-    original_prediction = model.predict(x_instance)[0]
-    original_probabilities = model.predict_proba(x_instance)[0]
-    print(f"\nOriginal prediction : {describe_label(original_prediction)}")
-    print(
-        "Probabilities       : "
-        f"Low={original_probabilities[0]:.3f}  High={original_probabilities[1]:.3f}"
-    )
+    for exp_num, idx in enumerate(low_quality_indices[:n], start=1):
+        print(f"\n{'='*50}")
+        print(f"Experiment {exp_num}/{n}  (test index {idx})")
+        print('='*50)
 
-    explanation = explainer.explain(x_instance)
-    if explanation.cf is None:
-        print("\nNo counterfactual found. Try increasing max_iterations or adjusting theta.")
-        return
+        x_instance = x_test_sc[idx : idx + 1]
 
-    counterfactual_x = explanation.cf["X"]
-    cf_prediction = model.predict(counterfactual_x)[0]
-    cf_probabilities = model.predict_proba(counterfactual_x)[0]
+        original_prediction = model.predict(x_instance)[0]
+        original_probabilities = model.predict_proba(x_instance)[0]
+        print(f"\nOriginal prediction : {describe_label(original_prediction)}")
+        print(
+            "Probabilities       : "
+            f"Low={original_probabilities[0]:.3f}  High={original_probabilities[1]:.3f}"
+        )
 
-    print(f"\nCounterfactual prediction : {describe_label(cf_prediction)}")
-    print(
-        "Probabilities             : "
-        f"Low={cf_probabilities[0]:.3f}  High={cf_probabilities[1]:.3f}"
-    )
+        explanation = explainer.explain(x_instance)
+        if explanation.cf is None:
+            print("\nNo counterfactual found. Try increasing max_iterations or adjusting theta.")
+            continue
 
-    original_values = scaler.inverse_transform(x_instance)[0]
-    counterfactual_values = scaler.inverse_transform(counterfactual_x)[0]
-    deltas = counterfactual_values - original_values
+        counterfactual_x = explanation.cf["X"]
+        cf_prediction = model.predict(counterfactual_x)[0]
+        cf_probabilities = model.predict_proba(counterfactual_x)[0]
 
-    results = pd.DataFrame(
-        {
-            "Feature": feature_names,
-            "Original Value": original_values.round(3),
-            "Counterfactual": counterfactual_values.round(3),
-            "Change": deltas.round(3),
-        }
-    )
+        print(f"\nCounterfactual prediction : {describe_label(cf_prediction)}")
+        print(
+            "Probabilities             : "
+            f"Low={cf_probabilities[0]:.3f}  High={cf_probabilities[1]:.3f}"
+        )
 
-    changed = results[results["Change"].abs() > 0.001].reset_index(drop=True)
-    print("\nFeatures changed to flip Low -> High Quality")
-    print(changed.to_string(index=False))
+        original_values = scaler.inverse_transform(x_instance)[0]
+        counterfactual_values = scaler.inverse_transform(counterfactual_x)[0]
+        deltas = counterfactual_values - original_values
+
+        results = pd.DataFrame(
+            {
+                "Feature": feature_names,
+                "Original Value": original_values.round(3),
+                "Counterfactual": counterfactual_values.round(3),
+                "Change": deltas.round(3),
+            }
+        )
+
+        changed = results[results["Change"].abs() > 0.001].reset_index(drop=True)
+        print("\nFeatures changed to flip Low -> High Quality")
+        print(changed.to_string(index=False))
 
 
 if __name__ == "__main__":
